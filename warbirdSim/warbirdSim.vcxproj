@@ -121,7 +121,10 @@
     <None Include="spaceShip-bs100.tri" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="manyModelsStatic.cpp" />
+    <ClInclude Include="object3D.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="warbirdSim.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

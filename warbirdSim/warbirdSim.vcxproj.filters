@@ -32,7 +32,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="manyModelsStatic.cpp">
+    <ClInclude Include="object3D.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="warbirdSim.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
