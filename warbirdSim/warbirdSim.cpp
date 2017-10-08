@@ -38,7 +38,7 @@ GLuint MVP;  // Model View Projection matrix's handle
 GLuint vPosition[numModels], vColor[numModels], vNormal[numModels];// vPosition, vColor, vNormal handles for models
 
 //Scale Value Variables
-float modelSize[numModels] = { //Absolute Scales for models
+float modelSize[numModels] = { //Desired Scales for models
   2000.0f, 
   200.0f, 
   400.0f,
@@ -47,7 +47,7 @@ float modelSize[numModels] = { //Absolute Scales for models
   100.0f,
   25.0f
 };
-glm::vec3 scale[numModels];       // Relative Scales (updated in init() )
+glm::vec3 scale[numModels];       // Actual Scales (updated in init())
 
 //Translation Value Variables
 glm::vec3 localTranslate[numModels] = { // Distance from Orbital Centers
@@ -59,7 +59,7 @@ glm::vec3 localTranslate[numModels] = { // Distance from Orbital Centers
   glm::vec3(15000.0f,0,0),
   glm::vec3(14500.0f,0,0)
 };
-glm::vec3 worldTranslate[numModels] = { // World Position Values ( updates in display() ) but here for camera's sake
+glm::vec3 worldTranslate[numModels] = { // World Position Values ( updates in display() ) but entered here for camera's sake
   glm::vec3(0,0,0),
   glm::vec3(4000.0f,0,0),
   glm::vec3(9000.0f,0,0),
@@ -108,8 +108,9 @@ glm::mat4 projectionMatrix;     // For use in display() set in reshape()
 
 glm::mat4 ModelViewProjectionMatrix; // For use in display();
 
-char * missileTitle = "Warbird 1  Unum ?  Secundus ?  ";
-char camTitle[20] = "Cam: Front";
+//Title Variable that can't be generated in updateTitle() ...)
+char * missileTitle = "Warbird 1  Unum ?  Secundus ?  "; //This one doesn't change
+char camTitle[20] = "Cam: Front"; // ...or at least not cleanly, update() already has a switch so why not)
 
 
 //Timer Variables
@@ -130,8 +131,7 @@ void init() {
   glGenBuffers(numModels, VBO);
   // Load Models
   for (int i = 0; i < numModels; i++) {
-    modelBoundingRadius[i] = loadModelBuffer(modelFile[i], numVertices[i], VAO[i], VBO[i], shaderProgram,
-      vPosition[i], vColor[i], vNormal[i], "vPosition", "vColor", "vNormal");
+    modelBoundingRadius[i] = loadModelBuffer(modelFile[i], numVertices[i], VAO[i], VBO[i], shaderProgram, vPosition[i], vColor[i], vNormal[i], "vPosition", "vColor", "vNormal");
     // Calculate scale from bounding radius and model scale
     scale[i] = glm::vec3(modelSize[i] * 1.0f / modelBoundingRadius[i]);
   }
@@ -157,7 +157,7 @@ void init() {
 
   // Set render state variables
   glEnable(GL_DEPTH_TEST);
-  glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
+  glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 }
 
 void updateTitle() {
