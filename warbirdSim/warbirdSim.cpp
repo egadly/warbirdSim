@@ -1,3 +1,8 @@
+// Ernest Gaddi
+// Project Ruber Phase 1
+// COMP465 GRAPHIC SYST/DSGN
+// October 8 2017
+
 # define __Windows__ 
 #ifndef _INCLUDES465_
   #include "../../includes465/include465.hpp"
@@ -98,7 +103,7 @@ unsigned currentCamera = 0; // Current Camera for View Matrix
 glm::vec3 eyeCameras[numCameras] = { //Relative Translations for Cameras
   glm::vec3(0, 10000, 20000),
   glm::vec3(0, 20000, 0),
-  glm::vec3(0, 300, 0),
+  glm::vec3(0, 300, 1000),
   glm::vec3(-4000.0f, 0.0f, -4000.0f),
   glm::vec3(-4000.0f, 0.0f, -4000.0f),
 };
@@ -115,8 +120,14 @@ char camTitle[20] = "Cam: Front"; // ...or at least not cleanly, update() alread
 
 //Timer Variables
 float timerDelay;
-float ace = 40;
-float fast = 5;
+float updateSpeed[4] = {
+  5,
+  40,
+  100,
+  500
+};
+unsigned currentUpdateSpeed = 0;
+
 double currentTime = 0;
 double previousTime = 0;
 int frameCount = 0;
@@ -153,7 +164,7 @@ void init() {
     glm::vec3(0),                   // look at position
     glm::vec3(0.0f, 1.0f, 0.0f)); // up vect0r
 
-  timerDelay = ace; // Set default update rate
+  timerDelay = updateSpeed[currentUpdateSpeed]; // Set default update rate
 
   // Set render state variables
   glEnable(GL_DEPTH_TEST);
@@ -199,12 +210,8 @@ void keyboard(unsigned char key, int x, int y) {
       if (currentCamera == 0) currentCamera = 4;
       else currentCamera = (currentCamera - 1) % numCameras;
       break;
-    case 'o': case 'O':
-      timerDelay = ace;
-      updateTitle();
-      break;
-    case 'p': case 'P':
-      timerDelay = fast;
+    case 't': case 'T':
+      timerDelay = updateSpeed[(++currentUpdateSpeed)%4];
       updateTitle();
       break;
   }
@@ -231,9 +238,9 @@ void update(int i) {
     strcpy(camTitle, "Cam: Top");
     break;
   case 2: // Warbird Camera
-    eye = worldTranslate[5] + glm::vec3(0, 300.0f, 0);
-    at = worldTranslate[5]; // Warbird's Position
-    viewMatrix = glm::lookAt(eye, at, glm::vec3(0, 0, -1));
+    eye = worldTranslate[5] + glm::vec3(0, 300.0f, 1000.0f);
+    at = worldTranslate[5] +glm::vec3(0, 300.0f, 0); // Warbird's Position
+    viewMatrix = glm::lookAt(eye, at, glm::vec3(0, 1,0));
     strcpy(camTitle, "Cam: Warbird");
     break;
   case 3: // Unum Camera (Ruber eclipses a lot but wait you'll see it eventually)
