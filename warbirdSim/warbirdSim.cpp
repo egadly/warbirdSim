@@ -42,7 +42,7 @@ GLuint shaderProgram;
 GLuint VAO[numModels];      // Vertex Array Objects
 GLuint VBO[numModels];   // Vertex Buffer Objects
 
-GLuint MVP;  // Model View Projection matrix's handle
+GLuint ViewMatrix, NormalMatrix, MVP;  // Model View Projection matrix's handle
 GLuint vPosition[numModels], vColor[numModels], vNormal[numModels];// vPosition, vColor, vNormal handles for models
 
 struct objectMVP { // general structure to produce model matrix
@@ -120,6 +120,7 @@ glm::vec3 eyeCameras[numCameras] = { //Relative Translations for Cameras
 glm::mat4 modelMatrix;
 glm::mat4 viewMatrix;
 glm::mat4 projectionMatrix;
+glm::mat3 normalMatrix;
 glm::mat4 ModelViewProjectionMatrix; // For use in display();
 
 char camTitle[20] = "Cam: Front"; // default camera title
@@ -334,14 +335,16 @@ void init() {
 
   //Assign MVP handler
   MVP = glGetUniformLocation(shaderProgram, "ModelViewProjection");
+  NormalMatrix = glGetUniformLocation(shaderProgram, "NormalMatrix");
+  ViewMatrix = glGetUniformLocation(shaderProgram, "ViewMatrix");
 
-  /*
+  
   printf("Shader program variable locations:\n");
   printf("  vPosition = %d  vColor = %d  vNormal = %d MVP = %d\n",
   glGetAttribLocation( shaderProgram, "vPosition" ),
   glGetAttribLocation( shaderProgram, "vColor" ),
   glGetAttribLocation( shaderProgram, "vNormal" ), MVP);
-  */
+  
 
   // Initialize default View Matrix since I'm not sure if update will call before display
   viewMatrix = glm::lookAt(
@@ -353,7 +356,7 @@ void init() {
 
                                                 // Set render state variables
   glEnable(GL_DEPTH_TEST);
-  glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+  glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
 }
 
 void updateTitle() {
@@ -650,7 +653,10 @@ void display() {
     astralObjects[m].translation = glm::vec3(modelMatrix[3]);
 
     ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+    normalMatrix = glm::mat3(viewMatrix * modelMatrix);
     glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+    glUniformMatrix3fv(NormalMatrix, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+    glUniformMatrix4fv(ViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glBindVertexArray(VAO[astralObjects[m].modelIndex]);
     glDrawArrays(GL_TRIANGLES, 0, numVertices[astralObjects[m].modelIndex]);
   }
@@ -659,7 +665,10 @@ void display() {
     modelMatrix = warbird.transform.orbitalMatrix * warbird.transform.translateMatrix * warbird.transform.rotationMatrix * warbird.transform.scaleMatrix;
     warbird.transform.translation = glm::vec3(modelMatrix[3]);
     ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+    normalMatrix = glm::mat3(viewMatrix * modelMatrix);
     glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+    glUniformMatrix3fv(NormalMatrix, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+    glUniformMatrix4fv(ViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glBindVertexArray(VAO[warbird.transform.modelIndex]);
     glDrawArrays(GL_TRIANGLES, 0, numVertices[warbird.transform.modelIndex]);
   }
@@ -672,7 +681,10 @@ void display() {
       missileSites[m].transform.translation = glm::vec3(modelMatrix[3]);
 
       ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+      normalMatrix = glm::mat3(viewMatrix * modelMatrix);
       glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+      glUniformMatrix3fv(NormalMatrix, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+      glUniformMatrix4fv(ViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
       glBindVertexArray(VAO[missileSites[m].transform.modelIndex]);
       glDrawArrays(GL_TRIANGLES, 0, numVertices[missileSites[m].transform.modelIndex]);
     }
@@ -686,7 +698,10 @@ void display() {
       missiles[m].transform.translation = glm::vec3(modelMatrix[3]);
 
       ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+      normalMatrix = glm::mat3(viewMatrix * modelMatrix);
       glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+      glUniformMatrix3fv(NormalMatrix, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+      glUniformMatrix4fv(ViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
       glBindVertexArray(VAO[missiles[m].transform.modelIndex]);
       glDrawArrays(GL_TRIANGLES, 0, numVertices[missiles[m].transform.modelIndex]);
     }
@@ -700,7 +715,10 @@ void display() {
       uMissiles[m].transform.translation = glm::vec3(modelMatrix[3]);
 
       ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+      normalMatrix = glm::mat3(viewMatrix * modelMatrix);
       glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+      glUniformMatrix3fv(NormalMatrix, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+      glUniformMatrix4fv(ViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
       glBindVertexArray(VAO[uMissiles[m].transform.modelIndex]);
       glDrawArrays(GL_TRIANGLES, 0, numVertices[uMissiles[m].transform.modelIndex]);
     }
@@ -714,7 +732,10 @@ void display() {
       dMissiles[m].transform.translation = glm::vec3(modelMatrix[3]);
 
       ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+      normalMatrix = glm::mat3(viewMatrix * modelMatrix);
       glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+      glUniformMatrix3fv(NormalMatrix, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+      glUniformMatrix4fv(ViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
       glBindVertexArray(VAO[dMissiles[m].transform.modelIndex]);
       glDrawArrays(GL_TRIANGLES, 0, numVertices[dMissiles[m].transform.modelIndex]);
     }
