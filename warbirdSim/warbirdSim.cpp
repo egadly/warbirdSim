@@ -6,10 +6,11 @@
 # define __Windows__ 
   #ifndef _INCLUDES465_
   #include "../../includes465/include465.hpp"
+  #include "../../includes465/texture465.hpp"
   #define _INCLUDES465_
 #endif
 
-const int numModels = 8;  // number of models in this scene
+const int numModels = 9;  // number of models in this scene
 char * modelFile[numModels] = { // model filenames
   "ruber.tri",
   "unum.tri",
@@ -18,7 +19,8 @@ char * modelFile[numModels] = { // model filenames
   "secundus.tri",
   "warbird.tri",
   "missile.tri",
-  "missilesites.tri"
+  "missilesites.tri",
+  "starfield.tri"
 };
 
 float modelBoundingRadius[numModels]; // model bound radius (for use if not normalized) set in init()
@@ -30,7 +32,8 @@ const int numVertices[numModels] = { // model vertices count (minimalist)
   21 * 3,
   69 * 3,
   93 * 3,
-  61 * 3
+  61 * 3,
+  2 * 3
 };
 
 //Shader Stuff
@@ -42,7 +45,7 @@ GLuint shaderProgram;
 GLuint VAO[numModels];      // Vertex Array Objects
 GLuint VBO[numModels];   // Vertex Buffer Objects
 
-GLuint ViewMatrix, NormalMatrix, MVP;  // Model View Projection matrix's handle
+GLuint UseTexture, Texture, ViewMatrix, NormalMatrix, MVP, IfRuber;  // Handles for Shader Variables
 GLuint vPosition[numModels], vColor[numModels], vNormal[numModels];// vPosition, vColor, vNormal handles for models
 
 struct objectMVP { // general structure to produce model matrix
@@ -231,6 +234,7 @@ void init() {
   shaderProgram = loadShaders(vertexShaderFile, fragmentShaderFile);
   glUseProgram(shaderProgram);
 
+
   // Generate Vertex <variable> Objects
   glGenVertexArrays(numModels, VAO);
   glGenBuffers(numModels, VBO);
@@ -333,17 +337,22 @@ void init() {
 
 
 
-  //Assign MVP handler
+  //Assign Shader Handles
   MVP = glGetUniformLocation(shaderProgram, "ModelViewProjection");
   NormalMatrix = glGetUniformLocation(shaderProgram, "NormalMatrix");
   ViewMatrix = glGetUniformLocation(shaderProgram, "ViewMatrix");
+  Texture = glGetUniformLocation(shaderProgram, "Texture");
+  UseTexture = glGetUniformLocation(shaderProgram, "UseTexture");
+  IfRuber = glGetUniformLocation(shaderProgram, "IfRuber");
+  printf("Texture:%d", loadRawTexture(Texture, "starfield.raw", 1024, 1024));
 
   
-  printf("Shader program variable locations:\n");
-  printf("  vPosition = %d  vColor = %d  vNormal = %d MVP = %d\n",
+  /*printf("Shader program variable locations:\n");
+  printf("  vPosition = %d  vColor = %d  vNormal = %d MVP = %d Texture = %d\n",
   glGetAttribLocation( shaderProgram, "vPosition" ),
   glGetAttribLocation( shaderProgram, "vColor" ),
-  glGetAttribLocation( shaderProgram, "vNormal" ), MVP);
+  glGetAttribLocation( shaderProgram, "vNormal" ), MVP,
+  glGetAttribLocation( shaderProgram, "Texture" ) );*/
   
 
   // Initialize default View Matrix since I'm not sure if update will call before display
@@ -645,6 +654,18 @@ void display() {
     break;
   }
 
+  //Starfield
+  glm::mat3 dummy3Matrix = glm::mat3();
+  glm::mat4 dummyMatrix = glm::mat4();
+  glUniform1f(UseTexture, true);
+  glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(dummyMatrix));
+  glUniformMatrix3fv(NormalMatrix, 1, GL_FALSE, glm::value_ptr(dummy3Matrix));
+  glUniformMatrix4fv(ViewMatrix, 1, GL_FALSE, glm::value_ptr(dummyMatrix));
+  glBindVertexArray(VAO[8]);
+  glDrawArrays(GL_TRIANGLES, 0, numVertices[8]);
+
+  glClear( GL_DEPTH_BUFFER_BIT ); //Clear Buffer so it's always behind
+
   //Astral Bodies
   glm::mat4 modelMatrix;
   for (int m = 0; m < 5; m++) {
@@ -657,6 +678,9 @@ void display() {
     glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
     glUniformMatrix3fv(NormalMatrix, 1, GL_FALSE, glm::value_ptr(normalMatrix));
     glUniformMatrix4fv(ViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+    glUniform1f(UseTexture, false);
+    if ( m== 0 ) glUniform1f(IfRuber, true);
+    else glUniform1f(IfRuber, false);
     glBindVertexArray(VAO[astralObjects[m].modelIndex]);
     glDrawArrays(GL_TRIANGLES, 0, numVertices[astralObjects[m].modelIndex]);
   }
@@ -740,8 +764,6 @@ void display() {
       glDrawArrays(GL_TRIANGLES, 0, numVertices[dMissiles[m].transform.modelIndex]);
     }
   }
-
-
 
   previousTime = currentTime; 
   currentTime = glutGet(GLUT_ELAPSED_TIME); // time management

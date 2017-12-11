@@ -32,7 +32,7 @@ void main(void) {
   vs_lightpos = view_lightpos.xyz; //Vec4 to Vec3
   gl_Position = position;
   vs_worldpos = position.xyz;
-  vs_normal = NormalMatrix * vNormal; 
+  vs_normal = NormalMatrix * vNormal;
   vsColor = vColor;
   }
  
