@@ -20,14 +20,16 @@ void main(void) {
    float ambient = 0.15f;   // Ambient Light Weight
    vec3 vs_light_direction = normalize(vs_lightpos - vs_worldpos); // Determine Light Direction
    vec3 normal = normalize(vs_normal);
-   float diffuse_cam = 0.25f*max(0.0, dot(normal, light_direction)); //Camera Directional Light
-   float diffuse_point = min( 5.0f, max( 0.0, 1000.0f*dot(normal,vs_light_direction)) ); //Ruber Point Light
-   float diffuse_ruber = 0.0f; //If not Ruber use this
-   if ( IfRuber ) diffuse_ruber = 0.15f; //If Ruber use this
-   if ( UseTexture ) {
+   float diffuse_cam = 0.25f*max(0.0, 0.1f+dot(normal, light_direction)); //Camera Directional Light/ Normal Diffuse (Shifted to get some more light out of orthognal normals)
+   float diffuse_point;
+   if (  dot( normal,vs_light_direction) > -0.333f ) diffuse_point = 1.0f; //Ruber Point Light / Flat Shading
+   else diffuse_point = 0.0f;
+   float diffuse_ruber = 0.1f; //If not Ruber use this
+   if ( IfRuber ) diffuse_ruber = 0.5f; //If Ruber use this
+   if ( UseTexture ) { //If textured
     color = texture(Texture,vec2( gl_FragCoord.x/800.0f, gl_FragCoord.y/600.0f) ); //Texture coordinate is based on Camera Position
    }
-   else {
+   else { //If not textured calculate light as normal
      color = ambient * (color_ambient) + (1.0f - ambient) * (diffuse_cam + diffuse_point + diffuse_ruber) * vsColor; //Ambient weight + diffuse weight
    }
 }

@@ -1,7 +1,7 @@
 // Ernest Gaddi
-// Project Ruber Phase 2
+// Project Ruber Phase 3
 // COMP465 GRAPHIC SYST/DSGN
-// November 19 2017
+// December 10 2017
 
 # define __Windows__ 
   #ifndef _INCLUDES465_
@@ -363,7 +363,7 @@ void init() {
 
   timerDelay = updateSpeed[currentUpdateSpeed]; // Set default update rate
 
-                                                // Set render state variables
+  // Set render state variables
   glEnable(GL_DEPTH_TEST);
   glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
 }
@@ -655,12 +655,12 @@ void display() {
   }
 
   //Starfield
-  glm::mat3 dummy3Matrix = glm::mat3();
-  glm::mat4 dummyMatrix = glm::mat4();
+  glm::mat3 dummy3Matrix = glm::mat3(); //identity matrices to set in shader
+  glm::mat4 dummy4Matrix = glm::mat4();
   glUniform1f(UseTexture, true);
-  glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(dummyMatrix));
+  glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(dummy4Matrix));
   glUniformMatrix3fv(NormalMatrix, 1, GL_FALSE, glm::value_ptr(dummy3Matrix));
-  glUniformMatrix4fv(ViewMatrix, 1, GL_FALSE, glm::value_ptr(dummyMatrix));
+  glUniformMatrix4fv(ViewMatrix, 1, GL_FALSE, glm::value_ptr(dummy4Matrix));
   glBindVertexArray(VAO[8]);
   glDrawArrays(GL_TRIANGLES, 0, numVertices[8]);
 
