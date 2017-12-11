@@ -44,3 +44,18 @@ Lighting:
 			if it does it is fully lighted; otherwise it is dark
 			*since skybox is fixed, use this strong lighting from ruber on ship for relative placement in space
 		ambient light is weighted with diffuse weighted relative to it
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+lastly, thank you to whoever reads this for looking over my work and (maybe) playing this game
